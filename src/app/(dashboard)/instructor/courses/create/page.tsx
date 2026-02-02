@@ -31,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input";
 import slugify from "slugify";
 import { Textarea } from "@/components/ui/textarea";
+import { SubmitHandler } from "react-hook-form";
 
 import {
   Select,
@@ -59,10 +60,9 @@ const CreateCoursePage = () => {
     },
   });
 
-  function onSubmit(values: CourseSchemaType) {
+  const onSubmit: SubmitHandler<CourseSchemaType> = (values) => {
     console.log(values);
-  }
-
+  };
   return (
     <>
       <div className="flex items-center mb-6  gap-4">

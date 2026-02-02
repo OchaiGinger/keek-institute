@@ -12,7 +12,6 @@ import {
 } from "./RenderState";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
-import { file } from "zod";
 
 interface uploaderProps {
   id: string | null;
@@ -41,6 +40,7 @@ export function Uploader({ onChange, value }: iAppProps) {
     error: false,
     objectUrl: undefined,
     fileType: "image",
+    key: value,
   });
 
   async function uploadFile(file: File) {
