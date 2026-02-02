@@ -16,34 +16,40 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  // credentials: {
-  //   async authorize(credentials: Record<string, unknown>) {
-  //     const { email, registrationNumber } = credentials as {
-  //       email: string;
-  //       registrationNumber: string;
-  //     };
+  credentials: {
+    async authorize(credentials: Record<string, unknown>) {
+      const { email, password } = credentials as {
+        email: string;
+        password?: string;
+      };
 
-  //     if (!email || !registrationNumber) return null;
+      if (!email) return null;
 
-  //     const student = await .findUnique({
-  //       where: { registrationNumber },
-  //       include: {
-  //         appUser: {
-  //           include: {
-  //             authUser: true,
-  //           },
-  //         },
-  //       },
-  //     });
+      // 1. Find the user by email
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: {
+          accounts: true, // This is where the password likely lives
+        },
+      });
 
-  //     if (!student) return null;
-  //     if (student.appUser.authUser.email !== email) return null;
+      if (!user) return null;
 
-  //     return {
-  //       id: student.appUser.authUser.id,
-  //       email: student.appUser.authUser.email,
-  //       name: `${student.firstName} ${student.lastName}`,
-  //     };
-  //   }
-  // }
+      // 2. Check password (using your Account model logic)
+      const account = user.accounts.find(
+        (acc) => acc.providerId === "credentials",
+      );
+      if (!account || account.password !== password) {
+        // Note: Always use bcrypt/argon2 to compare hashed passwords in production!
+        return null;
+      }
+
+      // 3. Return the user object for the session
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      };
+    },
+  },
 });
