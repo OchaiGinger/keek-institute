@@ -1,0 +1,357 @@
+QF5PG9HP9G4CFF9M4PWSPKPB
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  appUser       AppUser? // relation to AppUser (student/instructor profile)
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ==========================
+// Enums
+// ==========================
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// StudentCategory and TrainingMode are now models (seeded in database)
+
+enum StateOfOrigin {
+  ABIA
+  ADAMAWA
+  AKWA_IBOM
+  ANAMBRA
+  BAUCHI
+  BAYELSA
+  BENUE
+  BORNO
+  CROSS_RIVER
+  DELTA
+  EBONYI
+  EDO
+  EKITI
+  ENUGU
+  FCT
+  GOMBE
+  IMO
+  JIGAWA
+  KADUNA
+  KANO
+  KATSINA
+  KEBBI
+  KOGI
+  KWARA
+  LAGOS
+  NASARAWA
+  NIGER
+  OGUN
+  ONDO
+  OSUN
+  OYO
+  PLATEAU
+  RIVERS
+  SOKOTO
+  TARABA
+  YOBE
+  ZAMFARA
+}
+
+// ==========================
+// AppUser & Roles
+// ==========================
+model AppUser {
+  id         String @id @default(uuid())
+  authUserId String @unique
+  authUser   User   @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  status AccountStatus @default(DRAFT)
+
+  student    Student?
+  instructor Instructor?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id    String    @id @default(uuid())
+  name  String    @unique // STUDENT, ADMIN, INSTRUCTOR
+  users AppUser[]
+}
+
+enum AccountStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+// ==========================
+// Instructor & Student
+// ==========================
+model Instructor {
+  id        String  @id @default(uuid())
+  appUserId String  @unique
+  appUser   AppUser @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+
+  bio             String?
+  profilePhotoUrl String?
+  approvedAt      DateTime?
+
+  courses Course[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Student {
+  id        String  @id @default(uuid())
+  appUserId String  @unique
+  appUser   AppUser @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+
+  // System-generated
+  registrationNumber String? @unique
+
+  // Personal info
+  firstName   String
+  middleName  String?
+  lastName    String
+  gender      Gender
+  dateOfBirth DateTime
+  phone       String
+
+  // Location
+  nationality   String
+  stateOfOrigin StateOfOrigin
+  lga           String
+  address       String
+
+  // Program info
+  categoryId     String
+  category       StudentCategory @relation(fields: [categoryId], references: [id])
+  trainingModeId String
+  trainingMode   TrainingMode    @relation(fields: [trainingModeId], references: [id])
+
+  // Documents
+  ninNumber           String  @unique
+  passportPhotoPath   String
+  admissionLetterPath String?
+
+  // Status
+  status     AccountStatus @default(PENDING)
+  approvedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================
+// Student Categories & Training Modes
+// ==========================
+model StudentCategory {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  students Student[]
+}
+
+model TrainingMode {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  students Student[]
+}
+
+// ==========================
+// Courses & Learning
+// ==========================
+model Course {
+  id           String     @id @default(uuid())
+  instructorId String
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+
+  title       String
+  description String?
+  imageUrl    String?
+  price       Float?
+  isPublished Boolean @default(false)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  chapters     Chapter[]
+  attachments  Attachment[]
+  paypalOrders PaypalOrder[]
+  purchases    Purchase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([title])
+}
+
+model Category {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  courses Course[]
+}
+
+model Attachment {
+  id       String @id @default(uuid())
+  name     String
+  url      String
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model Chapter {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  videoUrl    String?
+  position    Int
+  isPublished Boolean @default(false)
+  isFree      Boolean @default(false)
+
+  muxData      MuxData?
+  courseId     String
+  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userProgress UserProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model MuxData {
+  id         String  @id @default(uuid())
+  assetId    String
+  playbackId String?
+  chapterId  String  @unique
+  chapter    Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id          String  @id @default(uuid())
+  userId      String
+  chapterId   String
+  chapter     Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  isCompleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, chapterId])
+  @@index([chapterId])
+}
+
+model Purchase {
+  id       String @id @default(uuid())
+  userId   String
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+model StripeCustomer {
+  id               String @id @default(uuid())
+  userId           String @unique
+  stripeCustomerId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaypalOrderStatus {
+  CREATED
+  COMPLETED
+  CANCELED
+}
+
+model PaypalOrder {
+  id       String            @id @default(uuid())
+  userId   String
+  courseId String
+  orderId  String            @unique
+  status   PaypalOrderStatus @default(CREATED)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
