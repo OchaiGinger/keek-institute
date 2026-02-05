@@ -1,4 +1,3 @@
-import { description } from "@/components/sidebar/chart-area-interactive";
 import * as z from "zod";
 
 export const courseLevelEnum = [
@@ -6,9 +5,7 @@ export const courseLevelEnum = [
   "INTERMEDIATE",
   "ADVANCED",
 ] as const;
-
 export const genderEnum = ["MALE", "FEMALE", "OTHER"] as const;
-
 export const CourseStatusEnum = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
 export const trainingModeEnum = ["ONLINE", "OFFLINE", "HYBRID"] as const;
 export const studentCategoryEnum = [
@@ -85,8 +82,6 @@ export const signupSchema = z.object({
   passportPhotoPath: z.any().optional(), // Handle file upload separately
 });
 
-export type SignupSchemaType = z.infer<typeof signupSchema>;
-
 export const signInSchema = z.object({
   email: z.string().email("Invalid school email address"),
   registrationNumber: z.string().min(5, "Registration number is required"),
@@ -107,6 +102,7 @@ export const LessonSchema = z.object({
   thumbnailKey: z.string().optional(),
 });
 
+export type SignupSchemaType = z.infer<typeof signupSchema>;
 export type SignInSchemaType = z.infer<typeof signInSchema>;
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;

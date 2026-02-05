@@ -1,0 +1,27 @@
+import prisma from "@/lib/prisma";
+import { requireInstructor } from "./require-admin";
+import { notFound } from "next/navigation";
+
+export async function InstructorGetLesson(lessonId: string) {
+  await requireInstructor();
+  const data = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      videoKey: true,
+      thumbnailKey: true,
+      position: true,
+    },
+  });
+
+  if (!data) {
+    return notFound();
+  }
+  return data;
+}
+
+export type InstructorLessonType = Awaited<
+  ReturnType<typeof InstructorGetLesson>
+>;
