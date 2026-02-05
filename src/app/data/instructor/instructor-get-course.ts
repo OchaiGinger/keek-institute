@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
 export async function InstructorGetCourse(id: string) {
+  // await new Promise((resolve) => setTimeout(resolve, 500));
   await requireInstructor();
 
   const data = await prisma.course.findUnique({

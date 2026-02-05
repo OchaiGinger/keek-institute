@@ -173,7 +173,7 @@ enum CourseStatus {
 model Course {
   id           String     @id @default(uuid())
   instructorId String
-  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  instructor   Instructor @relation(fields: [instructorId], references: [id], onDelete: Cascade)
 
   title       String
   description String

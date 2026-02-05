@@ -46,10 +46,13 @@ import { CreateCourse } from "./action";
 import { tryCatch } from "@/hooks/try-catch";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useConfetti } from "@/hooks/use-confetti";
 
 const CreateCoursePage = () => {
   const [ispending, startTransition] = useTransition();
   const router = useRouter();
+
+  const { triggerConfetti } = useConfetti();
 
   const form = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
@@ -77,6 +80,7 @@ const CreateCoursePage = () => {
 
       if (result.status == "success") {
         toast.success(result.message);
+        triggerConfetti();
         form.reset();
         router.push("/instructor/courses");
       } else if (result.status == "error") {
@@ -84,6 +88,7 @@ const CreateCoursePage = () => {
       }
     });
   };
+
   return (
     <>
       <div className="flex items-center mb-6  gap-4">
