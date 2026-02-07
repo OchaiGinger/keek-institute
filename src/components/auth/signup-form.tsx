@@ -115,7 +115,7 @@ export const SignUpForm = () => {
 
       // SUCCESS
       toast.success("Registration complete!", { id: toastId });
-      router.push("/onboarding-complete");
+      router.push("/waiting-room");
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "An unexpected error occurred", {

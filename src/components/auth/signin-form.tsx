@@ -1,57 +1,3 @@
-// import {
-//   Form,
-//   FormControl,
-//   FormField,
-//   FormItem,
-//   FormLabel,
-//   FormMessage,
-// } from "../ui/form";
-
-// import { SignInSchemaType, signInSchema } from "@/lib/zodSchema";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useForm } from "react-hook-form";
-// import { Input } from "../ui/input";
-
-// export const SignInForm = () => {
-//   const form = useForm<SignInSchemaType>({
-//     resolver: zodResolver(signInSchema),
-//     defaultValues: {
-//       email: "",
-//       password: "",
-//       registrationNumber: "",
-//     },
-//   });
-
-//   const onSubmit = (data: SignInSchemaType) => {
-//     console.log(data);
-//   };
-//   return (
-//     <>
-//       <Form {...form}>
-//         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-//           <FormField
-//             control={form.control}
-//             name="email"
-//             render={({ field }) => (
-//               <FormItem>
-//                 <FormLabel>Email</FormLabel>
-//                 <FormControl>
-//                   <Input
-//                     placeholder="example@gmail.com"
-//                     {...field}
-//                     type="email"
-//                   />
-//                 </FormControl>
-//                 <FormMessage />
-//               </FormItem>
-//             )}
-//           />
-//         </form>
-//       </Form>
-//     </>
-//   );
-// };
-
 "use client";
 
 import React, { useState } from "react";
@@ -75,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
+import { checkStudentOnboardingAction } from "./action";
 
 interface SignInFormProps {
   onToggle: () => void;
@@ -87,25 +34,74 @@ export const SignInForm = () => {
 
   const form = useForm<SignInSchemaType>({
     resolver: zodResolver(signInSchema),
-    defaultValues: { email: "", registrationNumber: "", password: "" },
+    defaultValues: {
+      email: "",
+      registrationNumber: "", // Keep as empty string
+      password: "",
+    },
   });
+
+  // Inside SignInForm.tsx
 
   const onSubmit = async (values: SignInSchemaType) => {
     setIsLoading(true);
-    // Triple-Lock verification sent to backend
-    const { error } = await authClient.signIn.email({
+
+    const { data, error } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
-      registrationNumber: isStudent ? values.registrationNumber : undefined,
-      callbackURL: "/dashboard",
-    } as any);
+      // registrationNumber is moved into fetchOptions.body
+      fetchOptions: {
+        body: {
+          registrationNumber: isStudent ? values.registrationNumber : undefined,
+        },
+      },
+    });
 
     if (error) {
       toast.error(error.message || "Login failed");
-    } else {
-      router.push("/dashboard");
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
+
+    // After successful login, determine the route
+    try {
+      // We fetch the session again or use a dedicated action to check onboarding
+      const { data: session } = await authClient.getSession();
+
+      if (!session) {
+        router.push("/signin");
+        return;
+      }
+
+      const role = session.user.role;
+
+      if (role === "ADMIN") {
+        router.push("/admin");
+      } else if (role === "INSTRUCTOR") {
+        router.push("/instructor");
+      } else {
+        // It's a Student (Role: USER)
+        // We need to check the 'onboardedBy' field from the Student model
+        // Since better-auth user object might not have it, we call a quick server action
+        const onboardingStatus = await checkStudentOnboardingAction(
+          session.user.id,
+        );
+
+        if (onboardingStatus.isOnboarded) {
+          router.push("/student");
+        } else {
+          // Force a full check by clearing any previous stale state
+          await router.prefetch("/onboarding");
+          router.push("/onboarding");
+        }
+      }
+
+      router.refresh();
+    } catch (err) {
+      toast.error("Error determining dashboard path");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -132,7 +128,12 @@ export const SignInForm = () => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              console.log("Validation Errors:", errors),
+            )}
+            className="space-y-5"
+          >
             <FormField
               control={form.control}
               name="email"

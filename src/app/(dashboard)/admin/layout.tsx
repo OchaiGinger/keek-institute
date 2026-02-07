@@ -1,17 +1,27 @@
-// app/admin/layout.tsx
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import {
+  DashboardLayout,
+  SidebarData,
+} from "@/components/dashboard/shared-layout";
 
-export default async function AdminLayout({
+const adminData: SidebarData = {
+  navMain: [
+    { title: "Dashboard", url: "/admin", icon: "LayoutDashboard" },
+    { title: "User Management", url: "/admin/users", icon: "Users" },
+    { title: "Revenue", url: "/admin/billing", icon: "Banknote" },
+  ],
+  navSecondary: [
+    { title: "Settings", url: "/admin/settings", icon: "Settings" },
+  ],
+};
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session || session.user.role !== "ADMIN") {
-    redirect("/"); // This WILL work if your DB role is "ADMIN"
-  }
-  return <>{children}</>;
+  return (
+    <DashboardLayout allowedRoles={["ADMIN"]} navData={adminData}>
+      {children}
+    </DashboardLayout>
+  );
 }

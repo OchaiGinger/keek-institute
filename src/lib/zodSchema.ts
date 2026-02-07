@@ -82,11 +82,25 @@ export const signupSchema = z.object({
   passportPhotoPath: z.any().optional(), // Handle file upload separately
 });
 
-export const signInSchema = z.object({
-  email: z.string().email("Invalid school email address"),
-  registrationNumber: z.string().min(5, "Registration number is required"),
-  password: z.string().min(1, "Password is required"),
-});
+export const signInSchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(1),
+    isStudent: z.boolean().optional(), // Add a hidden field to track role
+    registrationNumber: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.isStudent &&
+      (!data.registrationNumber || data.registrationNumber.length < 1)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Registration number is required for students",
+        path: ["registrationNumber"],
+      });
+    }
+  });
 
 export const chapterSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -102,6 +116,13 @@ export const LessonSchema = z.object({
   thumbnailKey: z.string().optional(),
 });
 
+export const inviteInstructorSchema = z.object({
+  name: z.string().min(2, "Full name is required"), // Used for the initial User creation or display
+  email: z.string().email("Invalid email address"),
+  bio: z.string().min(10, "Please provide a short specialization/bio"),
+});
+
+export type InviteInstructorSchemaType = z.infer<typeof inviteInstructorSchema>;
 export type SignupSchemaType = z.infer<typeof signupSchema>;
 export type SignInSchemaType = z.infer<typeof signInSchema>;
 export type CourseSchemaType = z.infer<typeof courseSchema>;

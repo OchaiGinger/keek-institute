@@ -1,22 +1,13 @@
+// components/sidebar/app-sidebar.tsx
 "use client";
 
-import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconFileAi,
-  IconFileDescription,
-  IconFolder,
-  IconHelp,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react";
 import * as React from "react";
-
+import * as Icons from "lucide-react";
+import Link from "next/link";
 import { NavMain } from "@/components/sidebar/nav-main";
 import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
+import { SidebarData, NavItem } from "@/components/dashboard/shared-layout";
 import {
   Sidebar,
   SidebarContent,
@@ -26,128 +17,48 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
 
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/instructor/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  navData: SidebarData;
+}
 
-    {
-      title: "Courses",
-      url: "/instructor/courses",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-};
+export function AppSidebar({ navData, ...props }: AppSidebarProps) {
+  // Logic to convert string names to Actual Components
+  const convertItems = (items: NavItem[]) =>
+    items.map((item) => ({
+      ...item,
+      icon: (Icons as any)[item.icon] || Icons.HelpCircle,
+    }));
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const processedNavMain = convertItems(navData.navMain);
+  const processedNavSecondary = navData.navSecondary
+    ? convertItems(navData.navSecondary)
+    : [];
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-            >
-              <Link href="/" className="flex items-center gap-2">
-                <img
-                  src="/logo.svg"
-                  alt="KeekInstitute Logo"
-                  width={24}
-                  height={24}
-                  className="size-9"
-                />
-                <span className="font-bold">Keek Institute</span>
+            <SidebarMenuButton asChild className="p-1.5!">
+              <Link href="/" className="flex items-center gap-3">
+                <img src="/logo.svg" alt="Logo" className="size-9" />
+                <div className="flex flex-col leading-tight">
+                  <span className="font-bold">Keek Institute</span>
+                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
 
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+      <SidebarContent>
+        <NavMain items={processedNavMain} />
+        {navData.navSecondary && (
+          <NavSecondary items={processedNavSecondary} className="mt-auto" />
+        )}
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

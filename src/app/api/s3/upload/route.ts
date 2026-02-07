@@ -16,7 +16,7 @@ export const fileUploadSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const session = await requireInstructor();
+  // const session = await requireInstructor();
 
   try {
     const body = await req.json();

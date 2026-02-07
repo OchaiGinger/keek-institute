@@ -68,26 +68,29 @@ model Student {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  registrationNumber String? @unique // Admin fills this later
+  registrationNumber String?  @unique // Admin fills this later
+  profilePhotoKey    String?
+  firstName          String
+  middleName         String?
+  lastName           String
+  gender             Gender
+  dateOfBirth        DateTime
+  phone              String
+  onboardedAt        DateTime @default(now())
+  onboarded          Boolean  @default(false) // Indicates if admin has completed onboarding details
 
-  firstName   String
-  middleName  String?
-  lastName    String
-  gender      Gender
-  dateOfBirth DateTime
-  phone       String
+  nationality       String
+  stateOfOrigin     String
+  lga               String
+  address           String
+  // AI Assessment Data
+  assessmentResults Json? // Stores { score, feedback, recommendedPath }
+  category          StudentCategory @default(REGULAR)
+  trainingMode      TrainingMode    @default(PHYSICAL)
 
-  nationality   String
-  stateOfOrigin String
-  lga           String
-  address       String
+  ninNumber String @unique
 
-  category     StudentCategory @default(REGULAR)
-  trainingMode TrainingMode    @default(PHYSICAL)
-
-  ninNumber         String        @unique
-  passportPhotoPath String
-  status            AccountStatus @default(PENDING)
+  status AccountStatus @default(PENDING)
 
   createdAt DateTime @default(now())
 }
