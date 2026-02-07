@@ -24,7 +24,7 @@ export default function Onboarding({ student }: OnboardingProps) {
   // Generate a temporary visual ID for the card preview
   const visualRegNo =
     student.registrationNumber ||
-    `KEEK/TEMP/${student.id?.slice(0, 5).toUpperCase()}`;
+    `Creed/TEMP/${student.id?.slice(0, 5).toUpperCase()}`;
 
   // Inside your Parent Component
   const handleComplete = async (quizResult: any) => {

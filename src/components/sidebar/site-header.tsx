@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ThemeToggle } from "../ui/themeToggle"
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "../ui/themeToggle";
 
 export function SiteHeader() {
   return (
@@ -12,12 +12,11 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-base font-bold">Keek Institute</h1>
+        <h1 className="text-base font-bold">Creed Academy</h1>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
-
         </div>
       </div>
     </header>
-  )
+  );
 }

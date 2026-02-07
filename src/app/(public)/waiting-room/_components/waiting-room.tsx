@@ -27,7 +27,7 @@ export const WaitingRoom = ({ student }: WaitingRoomProps) => {
             />
           </div>
           <div className="text-center relative z-10 text-white">
-            <p className="text-3xl font-bold tracking-tight">Keek Institute</p>
+            <p className="text-3xl font-bold tracking-tight">Creed Academy</p>
             <p className="text-blue-100/60 text-sm font-medium uppercase tracking-widest">
               Admissions
             </p>
@@ -83,7 +83,7 @@ export const WaitingRoom = ({ student }: WaitingRoomProps) => {
 
           <div className="flex items-center justify-between pt-6 border-t border-slate-100">
             <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
-              Keek Security
+              Creed Security
             </p>
             <Link
               href="/api/auth/signout"

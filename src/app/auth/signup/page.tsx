@@ -23,12 +23,12 @@ export default function SignUpPage() {
           <div className="bg-radial from-blue-500 to-blue-900 relative hidden md:flex flex-col items-center justify-center gap-y-4">
             <Image
               src="/logo.svg"
-              alt="keek institute logo"
+              alt="Creed Academy logo"
               width={92}
               height={92}
               className="h-23 w-23"
             />
-            <p className="text-2xl font-semibold text-white">Keek Institute</p>
+            <p className="text-2xl font-semibold text-white">Creed Academy</p>
           </div>
 
           <SignUpForm />
