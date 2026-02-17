@@ -15,6 +15,12 @@ enum Role {
   ADMIN
 }
 
+enum EnrollmentStatus {
+  Pending
+  Active
+  Cancled
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -56,8 +62,9 @@ model User {
   accounts Account[]
 
   // Back-relation to Instructor (optional)
-  instructor Instructor?
-  student    Student?
+  instructor  Instructor?
+  student     Student?
+  enrollments Enrollment[]
 
   @@unique([email])
   @@map("user")
@@ -79,18 +86,19 @@ model Student {
   onboardedAt        DateTime @default(now())
   onboarded          Boolean  @default(false) // Indicates if admin has completed onboarding details
 
-  nationality       String
-  stateOfOrigin     String
-  lga               String
-  address           String
+  nationality        String
+  stateOfOrigin      String
+  lga                String
+  address            String
   // AI Assessment Data
-  assessmentResults Json? // Stores { score, feedback, recommendedPath }
-  category          StudentCategory @default(REGULAR)
-  trainingMode      TrainingMode    @default(PHYSICAL)
+  assessmentResults  Json? // Stores { score, feedback, recommendedPath }
+  category           StudentCategory @default(REGULAR)
+  trainingMode       TrainingMode    @default(PHYSICAL)
+  paystackCustomerId String?         @unique
+  ninNumber          String          @unique
 
-  ninNumber String @unique
-
-  status AccountStatus @default(PENDING)
+  status     AccountStatus @default(PENDING)
+  enrollment Enrollment[]
 
   createdAt DateTime @default(now())
 }
@@ -192,8 +200,9 @@ model Course {
   status   CourseStatus @default(DRAFT)
   chapters Chapter[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  enrollments Enrollment[]
 
   @@index([instructorId])
   @@index([title])
@@ -232,4 +241,22 @@ model Lesson {
 
   @@index([chapterId])
   @@index([title])
+}
+
+model Enrollment {
+  id String @id @default(uuid())
+
+  amount    Int
+  status    EnrollmentStatus @default(Pending)
+  reference String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String
+
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId String?
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 }

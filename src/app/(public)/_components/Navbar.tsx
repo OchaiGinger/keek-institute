@@ -7,7 +7,7 @@ import { ThemeToggle } from "@/components/ui/themeToggle";
 const navigationItems = [
   { name: "Home", href: "/" },
   { name: "Courses", href: "/courses" },
-  { name: "Dashboard", href: "/Dashboard" },
+  { name: "Dashboard", href: "/student" },
 ];
 
 export function Navbar() {

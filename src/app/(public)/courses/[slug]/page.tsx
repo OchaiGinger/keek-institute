@@ -20,6 +20,7 @@ import {
   IconPlayerPlay,
 } from "@tabler/icons-react";
 import Image from "next/image";
+import { EnrollButton } from "./_components/enroll-button";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -165,7 +166,7 @@ const SlugPage = async ({ params }: PageProps) => {
         </div>
       </div>
 
-      <div className="order-2 md:order-1 md:col-span-1">
+      <div className="order-2 lg:col-span-1">
         <div className="sticky top-20">
           <Card>
             <CardContent className="p-6 space-y-6">
@@ -265,9 +266,7 @@ const SlugPage = async ({ params }: PageProps) => {
                 </ul>
               </div>
 
-              <Button className="w-full justify-center" size="lg">
-                Enroll Now!
-              </Button>
+              <EnrollButton courseId={course.id} />
               <p className="mt-3  text-center text-muted-foreground text-xs">
                 30-day money-back guarantee
               </p>

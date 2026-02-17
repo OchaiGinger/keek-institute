@@ -141,7 +141,7 @@ export const auth = betterAuth({
                 ninNumber: data.ninNumber || `PENDING-${Date.now()}`,
                 category: (data.category as any) || "REGULAR",
                 trainingMode: (data.trainingMode as any) || "PHYSICAL",
-                passportPhotoPath: "/placeholder-avatar.png",
+                profilePhotoKey: "/placeholder-avatar.png",
                 status: "PENDING",
               },
             });

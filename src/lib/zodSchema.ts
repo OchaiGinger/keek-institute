@@ -79,7 +79,7 @@ export const signupSchema = z.object({
   trainingMode: z.enum(trainingModeEnum, {
     message: "Training mode is required",
   }),
-  passportPhotoPath: z.any().optional(), // Handle file upload separately
+  profilePhotoKey: z.any().optional(), // Handle file upload separately
 });
 
 export const signInSchema = z

@@ -23,7 +23,6 @@ export async function POST(req: Request) {
         ninNumber: studentData.ninNumber,
         category: studentData.category,
         trainingMode: studentData.trainingMode,
-        passportPhotoPath: "/default-avatar.png", // Initial placeholder
         status: "PENDING",
       },
     });
