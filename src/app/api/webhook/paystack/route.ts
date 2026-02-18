@@ -1,38 +1,38 @@
+// app/api/webhook/paystack/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
-  const body = await req.text();
-  const hash = crypto
-    .createHmac("sha512", process.env.PAYSTACK_SECRET_KEY!)
-    .update(body)
-    .digest("hex");
+  try {
+    const event = await req.json();
+    console.log("🔥 WEBHOOK REACHED CODE! Event:", event.event);
 
-  // 1. Verify the request is actually from Paystack
-  if (hash !== req.headers.get("x-paystack-signature")) {
-    return new NextResponse("Invalid signature", { status: 401 });
+    if (event.event === "charge.success") {
+      const { courseId, userId, studentId } = event.data.metadata;
+
+      await prisma.enrollment.create({
+        data: {
+          courseId,
+          userId,
+          studentId,
+          status: "Active",
+          amount: event.data.amount / 100,
+          reference: event.data.reference,
+        },
+      });
+
+      console.log("✅ DATABASE UPDATED!");
+      return NextResponse.json({ message: "Success" }, { status: 200 });
+    }
+  } catch (err) {
+    console.error("❌ WEBHOOK ERROR:", err);
+    return NextResponse.json({ error: "Webhook failed" }, { status: 500 });
   }
+  return NextResponse.json({ message: "Ignored" }, { status: 200 });
+}
 
-  const event = JSON.parse(body);
-
-  // 2. Handle successful payment
-  if (event.event === "charge.success") {
-    const { courseId, userId } = event.data.metadata;
-
-    // 3. Update your database to "Enroll" the student
-    await prisma.enrollment.create({
-      data: {
-        courseId: courseId,
-        studentId: userId,
-        status: "Active",
-        amount: event.data.amount / 100, // Convert back from Kobo/Cents
-        reference: event.data.reference,
-      },
-    });
-
-    return new NextResponse("Success", { status: 200 });
-  }
-
-  return new NextResponse("Event ignored", { status: 200 });
+export async function GET(req: NextRequest) {
+  const { origin } = new URL(req.url);
+  // Redirect to our new success page
+  return NextResponse.redirect(`${origin}/student/enrollment-success`);
 }
