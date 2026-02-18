@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: "keekinstitute.t3.storage.dev",
+        hostname: "creedacademy.t3.storage.dev",
         port: "",
         protocol: "https",
       },

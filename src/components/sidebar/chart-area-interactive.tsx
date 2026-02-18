@@ -40,7 +40,7 @@ export function ChartAreaInteractive({
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           // Use a standard min-height to ensure rendering
-          className="aspect-auto h-[300px] w-full"
+          className="aspect-auto h-75 w-full"
           config={chartConfig}
         >
           <BarChart
