@@ -1,6 +1,6 @@
 // components/dashboard/dashboard-shell.tsx
 import { ChartAreaInteractive } from "@/components/sidebar/chart-area-interactive";
-import { DataTable } from "@/components/sidebar/data-table";
+// import { DataTable } from "@/components/sidebar/data-table";
 import { SectionCards } from "@/components/sidebar/section-cards";
 
 export const DashboardShell = ({
@@ -17,9 +17,10 @@ export const DashboardShell = ({
       </div>
       <SectionCards />
       <div className="rounded-xl border bg-white p-4 shadow-sm">
-        <ChartAreaInteractive />
+        {/* <ChartAreaInteractive /> */}
       </div>
-      <DataTable data={data} />
+      {/* <DataTable data={data} /> */}
+      Hello
     </>
   );
 };

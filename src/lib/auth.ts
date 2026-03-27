@@ -170,6 +170,6 @@ export const auth = betterAuth({
     error: "/auth-error",
   },
   plugins: [
-    multiSession(), // 2. Add this
+    // multiSession(), // 2. Add this
   ],
 });
