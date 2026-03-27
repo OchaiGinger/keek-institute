@@ -15,6 +15,7 @@ import {
   User2,
 } from "lucide-react";
 import Link from "next/link";
+import Testimonials from "@/components/sections/Testimonials";
 
 export default async function Home() {
   // make the function async
@@ -56,6 +57,7 @@ export default async function Home() {
       </section>
       <About />
       <Courses courses={courses} /> {/* pass fetched courses */}
+      <Testimonials />
     </>
   );
 }

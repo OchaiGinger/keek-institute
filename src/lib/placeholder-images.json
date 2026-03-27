@@ -1,0 +1,70 @@
+{
+  "placeholderImages": [
+    {
+      "id": "waste-costs",
+      "description": "Industrial waste and landfill area representing high disposal costs",
+      "imageUrl": "https://picsum.photos/seed/waste1/800/1000",
+      "imageHint": "waste landfill"
+    },
+    {
+      "id": "fragmented-ecosystem",
+      "description": "Complex network of logistics and transportation representing the fragmented ecosystem",
+      "imageUrl": "https://picsum.photos/seed/logistics1/800/1000",
+      "imageHint": "logistics network"
+    },
+    {
+      "id": "data-optimization",
+      "description": "Digital data visualization and analytics dashboard",
+      "imageUrl": "https://picsum.photos/seed/data1/800/1000",
+      "imageHint": "data analytics"
+    },
+    {
+      "id": "environmental-impact",
+      "description": "Lush green forest meeting industrial area, representing environmental impact",
+      "imageUrl": "https://images.unsplash.com/photo-1726597904186-c6ad20c21b03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxuYXR1cmUlMjBlbnZpcm9ubWVudHxlbnwwfHx8fDE3NzI1Nzg0NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "nature environment"
+    },
+    {
+      "id": "hero-abstract",
+      "description": "Abstract glass and light representing circularity",
+      "imageUrl": "https://picsum.photos/seed/abstract1/1200/800",
+      "imageHint": "abstract glass"
+    },
+    {
+      "id": "tech-neural",
+      "description": "Abstract neural network representation of AI",
+      "imageUrl": "https://picsum.photos/seed/ai-tech/1200/800",
+      "imageHint": "neural network"
+    },
+    {
+      "id": "impact-factory",
+      "description": "Modern sustainable factory with clean energy systems",
+      "imageUrl": "https://picsum.photos/seed/impact-eco/1200/800",
+      "imageHint": "sustainable factory"
+    },
+    {
+      "id": "phil-intelligence",
+      "description": "Abstract visualization of AI and neural networks",
+      "imageUrl": "https://picsum.photos/seed/phil1/800/600",
+      "imageHint": "neural network"
+    },
+    {
+      "id": "phil-loop",
+      "description": "Abstract circular light sculpture representing circularity",
+      "imageUrl": "https://picsum.photos/seed/phil2/800/600",
+      "imageHint": "abstract loop"
+    },
+    {
+      "id": "phil-economic",
+      "description": "Modern sustainable skyline representing economic growth",
+      "imageUrl": "https://picsum.photos/seed/phil3/800/600",
+      "imageHint": "sustainable city"
+    },
+    {
+      "id": "phil-transparency",
+      "description": "Clean glass architecture representing transparency",
+      "imageUrl": "https://picsum.photos/seed/phil4/800/600",
+      "imageHint": "glass building"
+    }
+  ]
+}
