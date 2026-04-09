@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react"
+import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react";
 
 import {
   SidebarGroup,
@@ -8,17 +8,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: Icon
-  }[]
+    title: string;
+    url: string;
+    icon?: Icon;
+  }[];
 }) {
   return (
     <SidebarGroup>
@@ -30,9 +30,10 @@ export function NavMain({
               tooltip="Quick Create"
               className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
             >
-              <Link href="/instructor/courses/create">
+              <Link href="keekinstitute/courses/create">
                 <IconCirclePlusFilled />
-                <span>Quick Create</span></Link>
+                <span>Quick Create</span>
+              </Link>
             </SidebarMenuButton>
             {/* <Button
               size="icon"
@@ -58,5 +59,5 @@ export function NavMain({
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }
