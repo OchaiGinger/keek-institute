@@ -19,16 +19,10 @@ const PublicCourseRoute = () => {
           learning goals
         </p>
       </div>
-      <CoursesErrorBoundary
-        fallbackRender={({ resetErrorBoundary }) => (
-          <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-            <p className="text-muted-foreground">Failed to load courses.</p>
-            <Button variant="outline" onClick={resetErrorBoundary}>
-              Retry
-            </Button>
-          </div>
-        )}
-      >
+
+      <CoursesErrorBoundary>
+        {" "}
+        {/* ← no function props, just children */}
         <Suspense fallback={<LoadingSkeletonLayout />}>
           <RenderCourses />
         </Suspense>
@@ -36,7 +30,6 @@ const PublicCourseRoute = () => {
     </div>
   );
 };
-
 export default PublicCourseRoute;
 
 async function RenderCourses() {

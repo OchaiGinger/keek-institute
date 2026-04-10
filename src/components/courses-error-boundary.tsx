@@ -1,30 +1,31 @@
-// app/(public)/courses/_components/courses-error-boundary.tsx
 "use client";
 
+import { ErrorBoundary } from "react-error-boundary";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 
-interface Props {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}
-
-// Just re-export from react-error-boundary — no class needed
-export { ErrorBoundary as CoursesErrorBoundary } from "react-error-boundary";
-
-export function CoursesFallback({
+function CoursesFallback({
   resetErrorBoundary,
 }: {
   resetErrorBoundary: () => void;
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-      <p className="text-muted-foreground">
-        Failed to load courses. Please try again.
-      </p>
+      <p className="text-muted-foreground">Failed to load courses.</p>
       <Button variant="outline" onClick={resetErrorBoundary}>
         Retry
       </Button>
     </div>
+  );
+}
+
+export function CoursesErrorBoundary({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ErrorBoundary FallbackComponent={CoursesFallback}>
+      {children}
+    </ErrorBoundary>
   );
 }
