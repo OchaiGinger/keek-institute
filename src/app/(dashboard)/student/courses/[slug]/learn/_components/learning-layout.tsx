@@ -4,7 +4,10 @@ import { useState } from "react";
 import { LearningCourse } from "@/app/data/student/get-learning-course";
 import { VideoPlayer } from "./video-player";
 import { CourseSidebar } from "./course-sidebar";
-import { IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from "@tabler/icons-react";
+import {
+  IconLayoutSidebarLeftCollapse,
+  IconLayoutSidebarLeftExpand,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 
 type Lesson = {
@@ -20,7 +23,9 @@ export function LearningLayout({ data }: { data: LearningCourse }) {
 
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(firstLesson);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
+  const [completedLessons, setCompletedLessons] = useState<Set<string>>(
+    new Set(),
+  );
 
   const markComplete = (lessonId: string) => {
     setCompletedLessons((prev) => new Set([...prev, lessonId]));
@@ -30,15 +35,16 @@ export function LearningLayout({ data }: { data: LearningCourse }) {
     ? `${bucketUrl}/${activeLesson.videoKey}`
     : null;
 
-  const progress = course.totalLessons > 0
-    ? Math.round((completedLessons.size / course.totalLessons) * 100)
-    : 0;
+  const progress =
+    course.totalLessons > 0
+      ? Math.round((completedLessons.size / course.totalLessons) * 100)
+      : 0;
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* Sidebar */}
       <div
-        className={`flex-shrink-0 border-r border-border bg-card transition-all duration-300 ease-in-out ${
+        className={`shrink-0 border-r border-border bg-card transition-all duration-300 ease-in-out ${
           sidebarOpen ? "w-80" : "w-0 overflow-hidden"
         }`}
       >
@@ -68,7 +74,9 @@ export function LearningLayout({ data }: { data: LearningCourse }) {
             )}
           </Button>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground truncate">{course.title}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {course.title}
+            </p>
             <p className="text-sm font-medium truncate">
               {activeLesson?.title ?? "Select a lesson"}
             </p>
@@ -90,7 +98,9 @@ export function LearningLayout({ data }: { data: LearningCourse }) {
           <VideoPlayer
             videoUrl={videoUrl}
             lesson={activeLesson}
-            isCompleted={activeLesson ? completedLessons.has(activeLesson.id) : false}
+            isCompleted={
+              activeLesson ? completedLessons.has(activeLesson.id) : false
+            }
             onComplete={() => activeLesson && markComplete(activeLesson.id)}
           />
         </div>
