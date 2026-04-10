@@ -7,7 +7,7 @@ const adminData: SidebarData = {
   navMain: [
     { title: "Dashboard", url: "/admin", icon: "LayoutDashboard" },
     { title: "User Management", url: "/admin/users", icon: "Users" },
-    { title: "Revenue", url: "/admin/billing", icon: "Banknote" },
+    { title: "Revenue", url: "/admin/revenue", icon: "Banknote" },
   ],
   navSecondary: [
     { title: "Settings", url: "/admin/settings", icon: "Settings" },

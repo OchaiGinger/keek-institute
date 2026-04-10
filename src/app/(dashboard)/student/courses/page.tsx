@@ -61,7 +61,7 @@ const StudentCoursesPage = async () => {
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
             </div>
 
             <CardContent className="space-y-4 p-5">
@@ -105,7 +105,7 @@ const StudentCoursesPage = async () => {
               </div>
 
               <Button asChild className="w-full gap-2">
-                <Link href={`/student/courses/${course.slug}`}>
+                <Link href={`/student/courses/${course.slug}/learn`}>
                   <IconPlayerPlay className="size-4" />
                   Continue Learning
                 </Link>
