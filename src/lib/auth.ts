@@ -2,7 +2,6 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 import { env } from "@/lib/env";
-import { multiSession } from "better-auth/plugins";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -30,70 +29,7 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    async authorize(credentials: Record<string, string>) {
-      const { email, password, registrationNumber } = credentials;
-
-      // 1. Fetch the user including their student profile and credentials
-      const user = await prisma.user.findUnique({
-        where: { email },
-        include: {
-          student: true,
-          accounts: { where: { providerId: "credentials" } },
-        },
-      });
-
-      // 2. Validate user exists and has a password
-      if (!user || !user.accounts[0]?.password) {
-        throw new Error("Invalid email or password");
-      }
-
-      // 3. Password Check (Assuming plain text or your chosen hashing)
-      const isPasswordCorrect = user.accounts[0].password === password;
-      if (!isPasswordCorrect) {
-        throw new Error("Invalid email or password");
-      }
-
-      // 4. ADMIN VERIFICATION
-      if (user.role === "ADMIN") {
-        return {
-          id: user.id,
-          email: user.email,
-          role: "ADMIN",
-          name: user.name,
-        };
-      }
-
-      // 5. INSTRUCTOR VERIFICATION
-      if (user.role === "INSTRUCTOR") {
-        return {
-          id: user.id,
-          email: user.email,
-          role: "INSTRUCTOR",
-          name: user.name,
-        };
-      }
-
-      // 6. STUDENT (USER) VERIFICATION
-      if (user.role === "USER") {
-        if (!user.student) {
-          throw new Error("Student profile not found. Please contact support.");
-        }
-
-        // Only enforce registrationNumber check for students
-        if (user.student.registrationNumber !== registrationNumber) {
-          throw new Error("Invalid Registration Number for this account.");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          role: "USER",
-          name: user.name,
-        };
-      }
-
-      return null;
-    },
+    // ← remove the entire authorize function, better-auth handles password hashing
   },
 
   databaseHooks: {
@@ -102,7 +38,6 @@ export const auth = betterAuth({
         after: async (user) => {
           const data = user as any;
 
-          // A. Logic for Instructor Invites
           const pendingInvite = await prisma.instructor.findUnique({
             where: { email: user.email },
           });
@@ -119,7 +54,6 @@ export const auth = betterAuth({
             return;
           }
 
-          // B. Logic for Seeding Student Profile
           try {
             const birthDate = data.dateOfBirth
               ? new Date(data.dateOfBirth)
@@ -146,10 +80,7 @@ export const auth = betterAuth({
               },
             });
           } catch (error) {
-            console.error(
-              "CRITICAL: Student Creation Failed during Signup Hook:",
-              error,
-            );
+            console.error("CRITICAL: Student Creation Failed:", error);
           }
         },
       },
@@ -163,13 +94,11 @@ export const auth = betterAuth({
     },
   },
 
-  // Ensure these match your actual route paths
   pages: {
     signIn: "/signin",
     signUp: "/signup",
     error: "/auth-error",
   },
-  plugins: [
-    // multiSession(), // 2. Add this
-  ],
+
+  plugins: [],
 });

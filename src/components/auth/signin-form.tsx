@@ -21,7 +21,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
-import { checkStudentOnboardingAction } from "./action";
+import {
+  checkStudentOnboardingAction,
+  validateRegistrationNumber,
+} from "./action";
 
 interface SignInFormProps {
   onToggle: () => void;
@@ -41,31 +44,36 @@ export const SignInForm = () => {
     },
   });
 
-  // Inside SignInForm.tsx
-
   const onSubmit = async (values: SignInSchemaType) => {
     setIsLoading(true);
-
-    const { data, error } = await authClient.signIn.email({
-      email: values.email,
-      password: values.password,
-      // registrationNumber is moved into fetchOptions.body
-      fetchOptions: {
-        body: {
-          registrationNumber: isStudent ? values.registrationNumber : undefined,
-        },
-      },
-    });
-
-    if (error) {
-      toast.error(error.message || "Login failed");
-      setIsLoading(false);
-      return;
-    }
-
-    // After successful login, determine the route
     try {
-      // We fetch the session again or use a dedicated action to check onboarding
+      // 1. ✅ Use the correct action for registration check
+      if (isStudent) {
+        const check = await validateRegistrationNumber(
+          // ← was checkStudentOnboardingAction
+          values.email,
+          values.registrationNumber!!,
+        );
+        if (!check.valid) {
+          toast.error("Invalid registration number for this email.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 2. Sign in
+      const { data, error } = await authClient.signIn.email({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        toast.error(error.message || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. Get session and route by role
       const { data: session } = await authClient.getSession();
 
       if (!session) {
@@ -80,30 +88,24 @@ export const SignInForm = () => {
       } else if (role === "INSTRUCTOR") {
         router.push("/instructor/dashboard");
       } else {
-        // It's a Student (Role: USER)
-        // We need to check the 'onboardedBy' field from the Student model
-        // Since better-auth user object might not have it, we call a quick server action
+        if (!session.user.id) {
+          toast.error("Session error. Please try again.");
+          return;
+        }
         const onboardingStatus = await checkStudentOnboardingAction(
+          // ← this one is correct, uses userId
           session.user.id,
         );
-
-        if (onboardingStatus.isOnboarded) {
-          router.push("/student");
-        } else {
-          // Force a full check by clearing any previous stale state
-          await router.prefetch("/onboarding");
-          router.push("/onboarding");
-        }
+        router.push(onboardingStatus.isOnboarded ? "/student" : "/onboarding");
       }
 
       router.refresh();
     } catch (err) {
-      toast.error("Error determining dashboard path");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <div>
       {/* Right Panel: Form Area */}
