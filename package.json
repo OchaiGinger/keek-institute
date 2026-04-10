@@ -84,6 +84,7 @@
     "react-day-picker": "^9.13.0",
     "react-dom": "19.2.3",
     "react-dropzone": "^14.4.0",
+    "react-error-boundary": "^6.1.1",
     "react-hook-form": "^7.71.1",
     "react-resizable-panels": "^1.0.10",
     "recharts": "^2.15.4",
