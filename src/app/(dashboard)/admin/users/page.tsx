@@ -1,4 +1,3 @@
-// app/admin/users/page.tsx
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -38,11 +37,10 @@ export default async function UserManagementPage() {
 
   const instructors = rawInstructors.map((i) => ({
     id: i.id,
-    // Use the stored name field first; fall back if they've already linked a User
     name: i.user?.name ?? i.name ?? "Pending Signup",
     email: i.email,
     userId: i.userId,
-    createdAt: i.createdAt,
+    createdAt: i.createdAt.toISOString(), // ← serialize Date for the client
   }));
 
   return (

@@ -30,19 +30,14 @@ import {
   type InviteInstructorSchemaType,
 } from "@/lib/zodSchema";
 import { inviteInstructorAction } from "./actions";
-
-type InviteResult = {
-  success: boolean;
-  instructor?: { id: string; name: string; email: string; createdAt: Date };
-  error?: string;
-};
+import { InviteInstructorResult } from "@/app/(dashboard)/student/actions";
 
 interface InviteInstructorModalProps {
   onInvited?: (instructor: {
     id: string;
     name: string;
     email: string;
-    createdAt: Date;
+    createdAt: string; // ISO string from server action
   }) => void;
 }
 
@@ -58,10 +53,15 @@ export function InviteInstructorModal({
 
   async function onSubmit(values: InviteInstructorSchemaType) {
     try {
-      const res = (await inviteInstructorAction(values)) as InviteResult;
-      if (res.success && res.instructor) {
+      const res: InviteInstructorResult = await inviteInstructorAction(values);
+      if (res.success) {
         toast.success(`Invitation sent to ${values.email}`);
-        onInvited?.(res.instructor);
+        onInvited?.({
+          id: res.id,
+          name: res.name,
+          email: res.email,
+          createdAt: res.createdAt,
+        });
         setOpen(false);
         form.reset();
       } else {
@@ -71,7 +71,6 @@ export function InviteInstructorModal({
       toast.error("Something went wrong");
     }
   }
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

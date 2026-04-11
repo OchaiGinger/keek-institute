@@ -1,6 +1,7 @@
 "use client";
 
-import { Briefcase, ChevronDown, Mail } from "lucide-react";
+import * as React from "react";
+import { Briefcase, ChevronDown } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,7 +18,35 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { InviteInstructorModal } from "./instructor-modal";
 
-export function InstructorList({ initialData }: { initialData: any[] }) {
+interface Instructor {
+  id: string;
+  name: string;
+  email: string;
+  userId?: string | null;
+  createdAt: string; // always a string — ISO from server or toISOString() from action
+}
+
+export function InstructorList({ initialData }: { initialData: Instructor[] }) {
+  const [data, setData] = React.useState<Instructor[]>(initialData);
+
+  function handleInvited(instructor: {
+    id: string;
+    name: string;
+    email: string;
+    createdAt: string;
+  }) {
+    setData((prev) => [
+      {
+        id: instructor.id,
+        name: instructor.name,
+        email: instructor.email,
+        userId: null,
+        createdAt: instructor.createdAt,
+      },
+      ...prev,
+    ]);
+  }
+
   return (
     <Collapsible defaultOpen className="rounded-xl border bg-card shadow-sm">
       <div className="flex items-center justify-between p-6 hover:bg-muted/50 transition-all group border-b">
@@ -35,27 +64,40 @@ export function InstructorList({ initialData }: { initialData: any[] }) {
           </div>
           <ChevronDown className="size-5 ml-auto transition-transform group-data-[state=open]:rotate-180" />
         </CollapsibleTrigger>
+
         <div className="ml-4">
-          <InviteInstructorModal />
+          <InviteInstructorModal onInvited={handleInvited} />
         </div>
       </div>
 
       <CollapsibleContent>
-        <div className="p-6 pt-0">
+        <div className="p-6 pt-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Instructor</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Joined Date</TableHead>
+                <TableHead>Date Added</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {initialData.map((inst) => (
+              {data.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-center text-muted-foreground text-sm py-8"
+                  >
+                    No instructors yet. Invite one to get started.
+                  </TableCell>
+                </TableRow>
+              )}
+              {data.map((inst) => (
                 <TableRow key={inst.id}>
                   <TableCell className="font-medium">{inst.name}</TableCell>
-                  <TableCell>{inst.email}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {inst.email}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={inst.userId ? "default" : "secondary"}>
                       {inst.userId ? "Active" : "Invited"}

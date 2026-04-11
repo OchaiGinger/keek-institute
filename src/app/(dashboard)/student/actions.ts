@@ -9,21 +9,24 @@ import { StudentApprovedEmail } from "@/emails/student-approved-email";
 import { InstructorInviteEmail } from "@/emails/instructor-invite-email";
 import type { InviteInstructorSchemaType } from "@/lib/zodSchema";
 
-// ─── Shared return types ──────────────────────────────────────────────────────
+// ─── Return types ─────────────────────────────────────────────────────────────
 
-export type ApproveStudentResult = {
-  success: boolean;
-  regNo?: string;
-  error?: string;
-};
+export type ApproveStudentResult =
+  | { success: true; regNo: string }
+  | { success: false; error: string };
 
-export type InviteInstructorResult = {
-  success: boolean;
-  instructor?: { id: string; name: string; email: string; createdAt: Date };
-  error?: string;
-};
+// This is the specific type your Modal is looking for
+export type InviteInstructorResult =
+  | {
+      success: true;
+      id: string;
+      name: string;
+      email: string;
+      createdAt: string;
+    }
+  | { success: false; error: string };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function generateRegNo(): string {
   const year = new Date().getFullYear();
@@ -35,7 +38,7 @@ function generateInviteToken(): string {
   return randomBytes(32).toString("hex");
 }
 
-// ─── Student Approval ────────────────────────────────────────────────────────
+// ─── Student Approval ─────────────────────────────────────────────────────────
 
 export async function approveStudentAction(
   studentId: string,
@@ -46,9 +49,11 @@ export async function approveStudentAction(
       include: { user: { select: { email: true } } },
     });
 
-    if (!student) return { success: false, error: "Student not found." };
+    if (!student)
+      return { success: false, error: "Student not found." } as const;
+
     if (student.status === "APPROVED") {
-      return { success: false, error: "Student is already approved." };
+      return { success: false, error: "Student is already approved." } as const;
     }
 
     const regNo = student.registrationNumber ?? generateRegNo();
@@ -74,19 +79,17 @@ export async function approveStudentAction(
     });
 
     if (mailError) {
-      // Approval is already saved — log but don't roll back
       console.error("[approveStudentAction] Resend error:", mailError);
     }
 
-    return { success: true, regNo };
+    return { success: true, regNo } as const;
   } catch (err: any) {
     const message = err?.message ?? "An unexpected error occurred.";
-    console.error("[approveStudentAction] caught:", message);
-    return { success: false, error: message };
+    return { success: false, error: message } as const;
   }
 }
 
-// ─── Instructor Invite ───────────────────────────────────────────────────────
+// ─── Instructor Invite ────────────────────────────────────────────────────────
 
 export async function inviteInstructorAction(
   values: InviteInstructorSchemaType,
@@ -95,23 +98,21 @@ export async function inviteInstructorAction(
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
-    // 1. Prevent duplicate invitations
     const existing = await prisma.instructor.findUnique({
       where: { email: normalizedEmail },
     });
+
     if (existing) {
       return {
         success: false,
         error: "An invitation has already been sent to this email address.",
-      };
+      } as const;
     }
 
-    // 2. Create instructor record
-    const instructor = await prisma.instructor.create({
-      data: { email: normalizedEmail, bio },
+    const newInstructor = await prisma.instructor.create({
+      data: { email: normalizedEmail, bio, name },
     });
 
-    // 3. Store invite token in the Verification table (no extra schema fields needed)
     const token = generateInviteToken();
     const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
 
@@ -124,7 +125,6 @@ export async function inviteInstructorAction(
       },
     });
 
-    // 4. Build invite URL and render email
     const inviteUrl =
       `${env.NEXT_PUBLIC_APP_URL}/sign-up` +
       `?token=${token}` +
@@ -135,40 +135,30 @@ export async function inviteInstructorAction(
       InstructorInviteEmail({ inviteUrl, expiresInHours: 48 }),
     );
 
-    // 5. Send email — log full response for debugging
-    const { data: mailData, error: mailError } = await resend.emails.send({
+    const { error: mailError } = await resend.emails.send({
       from: "Keek Institute <onboarding@resend.dev>",
       to: normalizedEmail,
       subject: "You're invited to join Keek Institute as an Instructor",
       html,
     });
 
-    console.log("[inviteInstructorAction] Resend response:", {
-      mailData,
-      mailError,
-    });
-
     if (mailError) {
-      // Roll back so the admin can retry cleanly
-      await prisma.instructor.delete({ where: { id: instructor.id } });
-      await prisma.verification.deleteMany({
-        where: { identifier: `instructor-invite:${normalizedEmail}` },
-      });
-      return { success: false, error: `Email failed: ${mailError.message}` };
+      await prisma.instructor.delete({ where: { id: newInstructor.id } });
+      return {
+        success: false,
+        error: `Email failed: ${mailError.message}`,
+      } as const;
     }
 
     return {
       success: true,
-      instructor: {
-        id: instructor.id,
-        name, // use form value — DB field may not exist yet
-        email: instructor.email,
-        createdAt: instructor.createdAt,
-      },
-    };
+      id: newInstructor.id,
+      name: newInstructor.name ?? "",
+      email: newInstructor.email,
+      createdAt: newInstructor.createdAt.toISOString(),
+    } as const;
   } catch (err: any) {
     const message = err?.message ?? "An unexpected error occurred.";
-    console.error("[inviteInstructorAction] caught:", message);
-    return { success: false, error: message };
+    return { success: false, error: message } as const;
   }
 }
