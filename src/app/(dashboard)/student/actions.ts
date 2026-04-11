@@ -139,7 +139,7 @@ export async function inviteInstructorAction(
     );
 
     const { error: mailError } = await resend.emails.send({
-      from: "Keek Institute <no-reply@yourdomain.com>",
+      from: "onboarding@resend.dev",
       to: normalizedEmail,
       subject: "You're invited to join Keek Institute as an Instructor",
       html,
