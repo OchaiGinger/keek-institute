@@ -37,10 +37,11 @@ export default async function UserManagementPage() {
 
   const instructors = rawInstructors.map((i) => ({
     id: i.id,
-    name: i.user?.name ?? i.name ?? "Pending Signup",
+    // Use a solid fallback to ensure this is NEVER null
+    name: (i.user?.name || i.name || "Pending Signup") as string,
     email: i.email,
-    userId: i.userId,
-    createdAt: i.createdAt.toISOString(), // ← serialize Date for the client
+    userId: i.userId ?? "", // Fallback if userId is null
+    createdAt: i.createdAt.toISOString(),
   }));
 
   return (
