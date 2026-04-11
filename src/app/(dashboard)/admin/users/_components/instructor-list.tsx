@@ -18,12 +18,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { InviteInstructorModal } from "./instructor-modal";
 
-interface Instructor {
+export interface Instructor {
   id: string;
   name: string;
   email: string;
-  userId?: string | null;
-  createdAt: string; // always a string — ISO from server or toISOString() from action
+  userId: string | null; // IMPORTANT: Must allow null
+  createdAt: string;
 }
 
 export function InstructorList({ initialData }: { initialData: Instructor[] }) {
@@ -64,7 +64,6 @@ export function InstructorList({ initialData }: { initialData: Instructor[] }) {
           </div>
           <ChevronDown className="size-5 ml-auto transition-transform group-data-[state=open]:rotate-180" />
         </CollapsibleTrigger>
-
         <div className="ml-4">
           <InviteInstructorModal onInvited={handleInvited} />
         </div>
@@ -82,32 +81,33 @@ export function InstructorList({ initialData }: { initialData: Instructor[] }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.length === 0 && (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={4}
-                    className="text-center text-muted-foreground text-sm py-8"
+                    className="text-center py-8 text-muted-foreground"
                   >
-                    No instructors yet. Invite one to get started.
+                    No instructors yet.
                   </TableCell>
                 </TableRow>
+              ) : (
+                data.map((inst) => (
+                  <TableRow key={inst.id}>
+                    <TableCell className="font-medium">{inst.name}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {inst.email}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={inst.userId ? "default" : "secondary"}>
+                        {inst.userId ? "Active" : "Invited"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(inst.createdAt).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
-              {data.map((inst) => (
-                <TableRow key={inst.id}>
-                  <TableCell className="font-medium">{inst.name}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {inst.email}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={inst.userId ? "default" : "secondary"}>
-                      {inst.userId ? "Active" : "Invited"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {new Date(inst.createdAt).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))}
             </TableBody>
           </Table>
         </div>

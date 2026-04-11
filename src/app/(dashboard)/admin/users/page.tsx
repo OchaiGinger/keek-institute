@@ -2,8 +2,9 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+
 import { StudentList } from "./_components/student-list";
-import { InstructorList } from "./_components/instructor-list";
+import { InstructorList, type Instructor } from "./_components/instructor-list";
 
 export default async function UserManagementPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -24,25 +25,27 @@ export default async function UserManagementPage() {
     }),
   ]);
 
+  // ✅ STUDENTS (safe already)
   const students = rawStudents.map((s) => ({
     id: s.id,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    registrationNumber: s.registrationNumber,
+    firstName: s.firstName || "",
+    lastName: s.lastName || "",
+    registrationNumber: s.registrationNumber || "N/A",
     category: s.category,
     trainingMode: s.trainingMode,
     status: s.status,
     email: s.user.email,
   }));
 
+  // ✅ INSTRUCTORS (FIXED PROPERLY)
   const instructors = rawInstructors.map((i) => ({
     id: i.id,
-    // Use a solid fallback to ensure this is NEVER null
-    name: (i.user?.name || i.name || "Pending Signup") as string,
+    // 🔥 GUARANTEE string (no more null issues)
+    name: i.user?.name ?? i.name ?? "Pending Signup",
     email: i.email,
-    userId: i.userId ?? "", // Fallback if userId is null
+    userId: i.userId ?? null,
     createdAt: i.createdAt.toISOString(),
-  }));
+  })) satisfies Instructor[];
 
   return (
     <div className="flex-1 space-y-8 p-8 pt-6">
@@ -57,6 +60,7 @@ export default async function UserManagementPage() {
 
       <div className="space-y-6">
         <StudentList initialData={students} />
+        {/* ✅ NO TYPE CAST NEEDED */}
         <InstructorList initialData={instructors} />
       </div>
     </div>
