@@ -44,7 +44,7 @@ const SlugPage = async ({ params }: PageProps) => {
       <div className="order-1 lg:col-span-2">
         <div className="relative aspect-video rounded-lg overflow-hidden w-full shadow-lg">
           <Image
-            src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.storage.dev/${course?.fileKey}`}
+            src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.tigrisfiles.io/${course?.fileKey}`}
             alt={course.title}
             fill
             priority

@@ -50,7 +50,7 @@ export async function getLearningCourse(slug: string) {
       ),
     },
     firstLesson,
-    bucketUrl: `https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.storage.dev`,
+    bucketUrl: `https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.tigrisfiles.io`,
   };
 }
 

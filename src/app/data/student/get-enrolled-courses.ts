@@ -41,7 +41,7 @@ export async function getEnrolledCourses() {
     enrolledAt: e.createdAt,
     course: {
       ...e.Course,
-      thumbnailUrl: `https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.storage.dev/${e.Course.fileKey}`,
+      thumbnailUrl: `https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.tigrisfiles.io/${e.Course.fileKey}`,
       totalLessons: e.Course.chapters.reduce(
         (sum, ch) => sum + ch.lessons.length,
         0,

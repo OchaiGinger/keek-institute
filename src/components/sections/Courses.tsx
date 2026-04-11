@@ -95,13 +95,13 @@ export const Courses = ({ courses }: CoursesProps) => {
                 {/* Thumbnail */}
                 <div className="relative w-full aspect-video overflow-hidden">
                   <Image
-                    src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.storage.dev/${course.fileKey}`}
+                    src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME}.t3.tigrisfiles.io/${course.fileKey}`}
                     alt={course.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale-[30%] group-hover:grayscale-0"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale-30 group-hover:grayscale-0"
                   />
                   {/* Gradient fade into card body */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#060a08] via-[#060a08]/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-[#060a08] via-[#060a08]/30 to-transparent" />
 
                   {/* Level badge — floating on image */}
                   <div

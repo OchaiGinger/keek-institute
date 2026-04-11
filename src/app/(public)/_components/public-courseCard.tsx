@@ -1,3 +1,5 @@
+"use client";
+
 import { publicCourseType } from "@/app/data/course/get-courses";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
