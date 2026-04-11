@@ -15,11 +15,7 @@ export default async function UserManagementPage() {
 
   const [rawStudents, rawInstructors] = await Promise.all([
     prisma.student.findMany({
-      where: {
-        user: {
-          role: "USER", // This excludes ADMIN and INSTRUCTOR roles
-        },
-      },
+      where: { user: { role: "USER" } },
       include: { user: true },
       orderBy: { createdAt: "desc" },
     }),
@@ -29,7 +25,6 @@ export default async function UserManagementPage() {
     }),
   ]);
 
-  // Flattening data to avoid serialization/circularity issues
   const students = rawStudents.map((s) => ({
     id: s.id,
     firstName: s.firstName,
@@ -43,8 +38,11 @@ export default async function UserManagementPage() {
 
   const instructors = rawInstructors.map((i) => ({
     id: i.id,
-    name: i.user?.name || "Pending Signup",
+    // Use the stored name field first; fall back if they've already linked a User
+    name: i.user?.name ?? i.name ?? "Pending Signup",
     email: i.email,
+    userId: i.userId,
+    createdAt: i.createdAt,
   }));
 
   return (

@@ -111,9 +111,9 @@ model Instructor {
   email String @unique
 
   // Link to User is OPTIONAL (nullable) because the user might not exist yet!
-  userId String? @unique
-  user   User?   @relation(fields: [userId], references: [id])
-
+  userId  String?  @unique
+  user    User?    @relation(fields: [userId], references: [id])
+  name    String?
   bio     String?
   courses Course[]
 

@@ -15,16 +15,19 @@ export const env = createEnv({
     GEMINI_API_KEY: z.string().min(1),
     PAYSTACK_PUBLIC_KEY: z.string().min(1),
     PAYSTACK_SECRET_KEY: z.string().min(1),
+    RESEND_API_KEY: z.string(),
   },
 
   client: {
     NEXT_PUBLIC_BETTER_AUTH_URL: z.string().url(),
     NEXT_PUBLIC_S3_BUCKET_NAME: z.string().min(1),
+    NEXT_PUBLIC_APP_URL: z.string().min(1),
   },
 
   // For Next.js >= 13.4.4, you only need to destructure client variables:
   experimental__runtimeEnv: {
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
     NEXT_PUBLIC_S3_BUCKET_NAME: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 });

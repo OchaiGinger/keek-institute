@@ -27,12 +27,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   inviteInstructorSchema,
-  InviteInstructorSchemaType,
+  type InviteInstructorSchemaType,
 } from "@/lib/zodSchema";
 import { inviteInstructorAction } from "./actions";
 
-export function InviteInstructorModal() {
+type InviteResult = {
+  success: boolean;
+  instructor?: { id: string; name: string; email: string; createdAt: Date };
+  error?: string;
+};
+
+interface InviteInstructorModalProps {
+  onInvited?: (instructor: {
+    id: string;
+    name: string;
+    email: string;
+    createdAt: Date;
+  }) => void;
+}
+
+export function InviteInstructorModal({
+  onInvited,
+}: InviteInstructorModalProps) {
   const [open, setOpen] = React.useState(false);
+
   const form = useForm<InviteInstructorSchemaType>({
     resolver: zodResolver(inviteInstructorSchema),
     defaultValues: { name: "", email: "", bio: "" },
@@ -40,15 +58,16 @@ export function InviteInstructorModal() {
 
   async function onSubmit(values: InviteInstructorSchemaType) {
     try {
-      const res = await inviteInstructorAction(values);
-      if (res.success) {
-        toast.success("Instructor invited successfully!");
+      const res = (await inviteInstructorAction(values)) as InviteResult;
+      if (res.success && res.instructor) {
+        toast.success(`Invitation sent to ${values.email}`);
+        onInvited?.(res.instructor);
         setOpen(false);
         form.reset();
       } else {
-        toast.error(res.error || "Failed to invite instructor");
+        toast.error(res.error ?? "Failed to invite instructor");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     }
   }
@@ -61,6 +80,7 @@ export function InviteInstructorModal() {
           Invite New Instructor
         </Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Invite Instructor</DialogTitle>
@@ -69,6 +89,7 @@ export function InviteInstructorModal() {
             via email.
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -113,11 +134,13 @@ export function InviteInstructorModal() {
                 </FormItem>
               )}
             />
+
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                disabled={form.formState.isSubmitting}
               >
                 Cancel
               </Button>
